@@ -17,10 +17,6 @@ mlflow.set_tracking_uri("file:///C:/envs/mlflow_P5/mlruns")
 # ─── Chargements ──────────────────────────────────────────────────────────────
 st.write(f"Environnement Python actif : {os.environ.get('VIRTUAL_ENV', sys.prefix)}")
 
-
-# ─── Chargements ──────────────────────────────────────────────────────────────
-st.write(f"Environnement Python actif : {os.environ.get('VIRTUAL_ENV', sys.prefix)}")
-
 # 1. USE (Universal Sentence Encoder)
 @st.cache_resource
 def load_use_model():
@@ -44,3 +40,25 @@ st.title("Gaëlle_Genvrin_P5_API – Deep Learning + USE")
 st.write("Entrez votre question StackOverflow ci-dessous 👇")
 
 question = st.text_area("Question StackOverflow", height=150)
+
+# ─── Prédiction ───────────────────────────────────────────────────────────────
+def predict_top_5_dl(text):
+    embed = use_model([text])  # Liste → Tensor
+    embed_scaled = scaler_USE.transform(embed)  # Applique la normalisation
+
+    probs = model.predict_proba(embed_scaled)[0]  # Prédiction des probabilités
+
+    tag_probs = list(zip(tags_list, probs))
+    tag_probs_sorted = sorted(tag_probs, key=lambda x: x[1], reverse=True)
+    
+    return tag_probs_sorted[:35]
+
+# ─── Affichage ────────────────────────────────────────────────────────────────
+if st.button("Générer les tags"):
+    if not question.strip():
+        st.warning("❗ Veuillez entrer une question.")
+    else:
+        top_preds = predict_top_5_dl(question)
+        st.subheader("🏷️ Top 35 tags prédits")
+        for tag, p in top_preds:
+            st.write(f"**{tag}** — {p:.6f}")
