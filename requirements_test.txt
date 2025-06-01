@@ -1,0 +1,4 @@
+pytest
+mlflow
+tensorflow
+tensorflow_hub
