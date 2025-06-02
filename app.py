@@ -29,7 +29,7 @@ def load_use_model():
 use_model = load_use_model()
 
 # 2. Chargement du modèle de classification depuis MLflow
-model_dir = r"C:/envs/P5_models/USE_RL2_model"
+model_dir = os.path.join(os.path.dirname(__file__), "models", "USE_RL2_model")
 model = joblib.load(os.path.join(model_dir, "model.joblib"))
 
 # 3. Chargement du scaler pour normaliser les embeddings
