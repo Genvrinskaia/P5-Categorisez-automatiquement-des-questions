@@ -14,30 +14,35 @@ if os.name == "nt":  # Windows (local)
 else:  # Linux (CI/CD)
     os.environ["TFHUB_CACHE_DIR"] = "/tmp/tfhub_cache"
 
-
 # ─── MLflow ───────────────────────────────────────────────────────────────────
 mlflow.set_tracking_uri("file:///C:/envs/mlflow_P5/mlruns")
 
-# ─── Chargements ──────────────────────────────────────────────────────────────
+# ─── Chargements statiques ─────────────────────────────────────────────────────
 st.write(f"Environnement Python actif : {os.environ.get('VIRTUAL_ENV', sys.prefix)}")
 
-# 1. USE (Universal Sentence Encoder)
+# Chargement du modèle de classification depuis MLflow
+model_dir = os.path.join(os.path.dirname(__file__), "models", "USE_RL2_model")
+model = joblib.load(os.path.join(model_dir, "model.joblib"))
+
+# Chargement du scaler pour normaliser les embeddings
+scaler_USE = joblib.load(os.path.join(model_dir, "scaler_USE.joblib"))
+
+# MultiLabelBinarizer
+mlb = joblib.load(os.path.join(model_dir, "P5_mlb.pkl"))
+tags_list = mlb.classes_
+
+# ─── Chargement paresseux du USE ───────────────────────────────────────────────
 @st.cache_resource
 def load_use_model():
     return hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 
-use_model = load_use_model()
+use_model = None
 
-# 2. Chargement du modèle de classification depuis MLflow
-model_dir = os.path.join(os.path.dirname(__file__), "models", "USE_RL2_model")
-model = joblib.load(os.path.join(model_dir, "model.joblib"))
-
-# 3. Chargement du scaler pour normaliser les embeddings
-scaler_USE = joblib.load(os.path.join(model_dir, "scaler_USE.joblib"))
-
-# 4. MultiLabelBinarizer
-mlb = joblib.load(os.path.join(model_dir, "P5_mlb.pkl"))
-tags_list = mlb.classes_
+def get_use_model():
+    global use_model
+    if use_model is None:
+        use_model = load_use_model()
+    return use_model
 
 # ─── Interface ────────────────────────────────────────────────────────────────
 st.title("Gaëlle_Genvrin_P5_API – Deep Learning + USE")
@@ -47,14 +52,15 @@ question = st.text_area("Question StackOverflow", height=150)
 
 # ─── Prédiction ───────────────────────────────────────────────────────────────
 def predict_top_5_dl(text):
-    embed = use_model([text])  # Liste → Tensor
+    model_use = get_use_model()
+    embed = model_use([text])  # Liste → Tensor
     embed_scaled = scaler_USE.transform(embed)  # Applique la normalisation
 
     probs = model.predict_proba(embed_scaled)[0]  # Prédiction des probabilités
 
     tag_probs = list(zip(tags_list, probs))
     tag_probs_sorted = sorted(tag_probs, key=lambda x: x[1], reverse=True)
-    
+
     return tag_probs_sorted[:35]
 
 # ─── Affichage ────────────────────────────────────────────────────────────────

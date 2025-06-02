@@ -3,3 +3,5 @@ streamlit
 mlflow
 tensorflow
 tensorflow_hub
+joblib
+numpy
