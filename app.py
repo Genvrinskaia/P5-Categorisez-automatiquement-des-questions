@@ -11,7 +11,7 @@ from mlflow.sklearn import load_model
 # ─── Config TF Hub Cache ──────────────────────────────────────────────────────
 if os.name == "nt":  # Windows (local)
     os.environ["TFHUB_CACHE_DIR"] = r"C:\envs\P5\tfhub_cache"
-else:  # Linux (CI/CD, ex: GitHub Actions)
+else:  # Linux (CI/CD)
     os.environ["TFHUB_CACHE_DIR"] = "/tmp/tfhub_cache"
 
 
@@ -33,10 +33,10 @@ model_dir = os.path.join(os.path.dirname(__file__), "models", "USE_RL2_model")
 model = joblib.load(os.path.join(model_dir, "model.joblib"))
 
 # 3. Chargement du scaler pour normaliser les embeddings
-scaler_USE = joblib.load(r"C:\envs\P5\scaler_USE.joblib")
+scaler_USE = joblib.load(os.path.join(model_dir, "scaler_USE.joblib"))
 
 # 4. MultiLabelBinarizer
-mlb = joblib.load(r"C:\envs\P5\P5_mlb.pkl")
+mlb = joblib.load(os.path.join(model_dir, "P5_mlb.pkl"))
 tags_list = mlb.classes_
 
 # ─── Interface ────────────────────────────────────────────────────────────────
