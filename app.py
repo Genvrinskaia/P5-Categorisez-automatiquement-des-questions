@@ -9,7 +9,11 @@ import mlflow
 from mlflow.sklearn import load_model
 
 # ─── Config TF Hub Cache ──────────────────────────────────────────────────────
-os.environ["TFHUB_CACHE_DIR"] = r"C:\envs\P5\tfhub_cache"
+if os.name == "nt":  # Windows (local)
+    os.environ["TFHUB_CACHE_DIR"] = r"C:\envs\P5\tfhub_cache"
+else:  # Linux (CI/CD, ex: GitHub Actions)
+    os.environ["TFHUB_CACHE_DIR"] = "/tmp/tfhub_cache"
+
 
 # ─── MLflow ───────────────────────────────────────────────────────────────────
 mlflow.set_tracking_uri("file:///C:/envs/mlflow_P5/mlruns")
