@@ -1,0 +1,41 @@
+name: Deploy to AWS EC2
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-central-1
+  S3BUCKET: amazon-sagemaker-430118827415-eu-central-1-6d39b3cee14d
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Dev
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Zip source files
+        run: zip -r deploy-package.zip .
+
+      - name: Upload package to S3
+        run: aws s3 cp deploy-package.zip s3://${{ env.S3BUCKET }}/
+
+      - name: Trigger CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name TonNomApplicationCodeDeploy \
+            --deployment-group-name TonNomGroupeDeploiement \
+            --s3-location bucket=${{ env.S3BUCKET }},bundleType=zip,key=deploy-package.zip \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --file-exists-behavior OVERWRITE
