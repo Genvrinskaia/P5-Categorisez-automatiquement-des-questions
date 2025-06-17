@@ -1,13 +1,21 @@
 # Utilise une image officielle Python
 FROM python:3.9-slim
 
+# Installe les dépendances système nécessaires
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Crée et définit un répertoire de travail
 WORKDIR /app
 
 # Copie les fichiers dans le conteneur
 COPY . /app
 
-# Installe les dépendances
+# Installe les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Crée le dossier .streamlit avec les bons droits
