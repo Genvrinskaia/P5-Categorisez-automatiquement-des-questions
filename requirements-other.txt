@@ -1,0 +1,13 @@
+panda
+numpy
+re
+nltk
+gensim
+spacy
+scikit-learn
+tensorflow
+transformer
+mlflow
+kedro
+matplotlib
+seaborn
