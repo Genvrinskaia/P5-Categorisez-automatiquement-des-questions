@@ -27,8 +27,10 @@ jobs:
         run: huggingface-cli login --token $HF_TOKEN
 
       - name: Clone HF Space repo
+        env:
+          HF_TOKEN: ${{ secrets.HF_ACCESS_TOKEN }}
         run: |
-          huggingface-cli repo clone Genvrin/Tags_Question_StackOverflow
+          git clone https://hf_token:${HF_TOKEN}@huggingface.co/spaces/Genvrin/Tags_Question_StackOverflow
         shell: bash
 
       - name: Copy files to HF Space repo
