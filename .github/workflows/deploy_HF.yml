@@ -18,23 +18,19 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install huggingface_hub
-        run: pip install huggingface_hub
-
-      - name: Login to Hugging Face CLI
-        env:
-          HF_TOKEN: ${{ secrets.HF_ACCESS_TOKEN }}
-        run: huggingface-cli login --token $HF_TOKEN
+      - name: Install git and dependencies
+        run: |
+          pip install huggingface_hub
 
       - name: Clone HF Space repo
+        env:
+          HF_TOKEN: ${{ secrets.HF_ACCESS_TOKEN }}
         run: |
-          huggingface-cli repo clone Genvrin/Tags_Question_StackOverflow hf_space
-        shell: bash
+          git clone https://ggenv:${HF_TOKEN}@huggingface.co/spaces/Genvrin/Tags_Question_StackOverflow hf_space
 
       - name: Copy files to HF Space repo
         run: |
-          cp -r app.py Dockerfile requirements.txt README.md hf_space/
-        shell: bash
+          cp -r GitHub_HF/* hf_space/
 
       - name: Commit and push changes to HF Space repo
         run: |
@@ -44,4 +40,3 @@ jobs:
           git add .
           git commit -m "Deploy update from GitHub Actions" || echo "No changes to commit"
           git push
-        shell: bash
