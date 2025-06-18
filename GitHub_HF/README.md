@@ -1,14 +1,27 @@
+---
+title: Tags Question StackOverflow
+emoji: "🏷️"
+colorFrom: "indigo"
+colorTo: "purple"
+sdk: streamlit
+sdk_version: "1.25.0"
+app_file: app.py
+pinned: true
+---
+
 # Tags_Question_StackOverflow
 
-## Description
+Application Streamlit pour prédire automatiquement les tags des questions StackOverflow  
+Basée sur un modèle Deep Learning avec Universal Sentence Encoder (USE).
 
-Cette application Streamlit permet de prédire les tags pertinents pour une question StackOverflow en utilisant un modèle de Deep Learning avec Universal Sentence Encoder (USE).
+---
 
-Le modèle de classification est chargé depuis MLflow, et l'application utilise TensorFlow Hub pour le modèle USE.
+## Usage
 
-## Installation
+Entrez votre question et cliquez sur **Générer les tags** pour voir les prédictions.
 
-Pour installer les dépendances nécessaires, exécutez :
+---
 
-```bash
-pip install -r requirements.txt
+## Déploiement
+
+Ce projet est déployé automatiquement sur Hugging Face Spaces via GitHub Actions.
