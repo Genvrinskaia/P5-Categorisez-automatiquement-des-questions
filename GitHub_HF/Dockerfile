@@ -12,16 +12,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Crée et définit un répertoire de travail
 WORKDIR /app
 
-# Copie les fichiers dans le conteneur
-COPY . /app
+# Copie les fichiers requirements en premier pour optimiser le cache Docker
+COPY requirements.txt /app/
 
 # Installe les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copie tout le contenu de ton repo dans /app (y compris models)
+COPY . /app
+
 # Crée le dossier .streamlit avec les bons droits
 RUN mkdir -p /app/.streamlit
 
-# Ajoute un fichier de config minimal si besoin
+# Ajoute un fichier de config minimal pour Streamlit
 RUN echo "\
 [server]\n\
 headless = true\n\
@@ -30,5 +33,8 @@ enableCORS = false\n\
 \n\
 " > /app/.streamlit/config.toml
 
-# Lance l'application
+# Expose le port 7860 (facultatif mais recommandé)
+EXPOSE 7860
+
+# Commande pour lancer l'application
 CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
