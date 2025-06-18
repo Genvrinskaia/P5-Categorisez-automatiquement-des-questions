@@ -1,0 +1,47 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install huggingface_hub
+        run: pip install huggingface_hub
+
+      - name: Login to Hugging Face CLI
+        env:
+          HF_TOKEN: ${{ secrets.HF_ACCESS_TOKEN }}
+        run: huggingface-cli login --token $HF_TOKEN
+
+      - name: Clone HF Space repo
+        run: |
+          huggingface-cli repo clone Genvrin/Tags_Question_StackOverflow
+        shell: bash
+
+      - name: Copy files to HF Space repo
+        run: |
+          cp -r * Tags_Question_StackOverflow/
+        shell: bash
+
+      - name: Commit and push changes to HF Space repo
+        run: |
+          cd Tags_Question_StackOverflow
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy update from GitHub Actions" || echo "No changes to commit"
+          git push
+        shell: bash
